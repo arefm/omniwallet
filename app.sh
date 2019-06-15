@@ -1,8 +1,8 @@
 #define where omniwallet should store log files. 
-DATADIR="/var/lib/omniwallet"
+DATADIR="/home/aref/workspace/newsha/wallet/_data"
 
 #!/bin/bash
-PYTHONBIN=python
+PYTHONBIN=/home/aref/workspace/newsha/wallet/walletenv/bin/python
 
 kill_child_processes() {
   kill $SERVER_PID
@@ -41,7 +41,7 @@ do
     if [ -e "$DATADIR/debug.level" ]; then
         DEBUGLEVEL=`cat $DATADIR/debug.level`
     else
-        DEBUGLEVEL=0
+        DEBUGLEVEL=5
     fi
     export DEBUGLEVEL
 
@@ -51,11 +51,7 @@ do
       else
         echo "Starting uwsgi daemon..."
         cd $APPDIR/api
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-          uwsgi -s 127.0.0.1:1088 -p 8 -M --vhost --enable-threads --log-x-forwarded-for --logto $DATADIR/apps.log &
-        else
-          uwsgi -s 127.0.0.1:1088 -p 8 -M --vhost --enable-threads --log-x-forwarded-for --plugin $PYTHONBIN --logto $DATADIR/apps.log &
-        fi
+        uwsgi -s 127.0.0.1:1088 -p 8 -M --vhost --enable-threads --log-x-forwarded-for --plugin python --logto $DATADIR/apps.log &
         SERVER_PID=$!
         echo $SERVER_PID > /tmp/omniapp.pid
         #get snapshot of directory files
